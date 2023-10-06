@@ -11,32 +11,24 @@ let startY = null;
 
 const points = [
 	{
-		x: 50,
-		y: 50,
+		x: 137,
+		y: 373,
 		radius: 8,
 		borderWidth: 1,
 		borderColor: 'black',
 		fillColor: 'red',
 	},
 	{
-		x: 150,
-		y: 150,
+		x: 489,
+		y: 72,
 		radius: 8,
 		borderWidth: 1,
 		borderColor: 'black',
 		fillColor: 'red',
 	},
 	{
-		x: 300,
-		y: 400,
-		radius: 8,
-		borderWidth: 1,
-		borderColor: 'black',
-		fillColor: 'red',
-	},
-	{
-		x: 500,
-		y: 50,
+		x: 891,
+		y: 436,
 		radius: 8,
 		borderWidth: 1,
 		borderColor: 'black',
@@ -54,15 +46,15 @@ function drawPoint(x, y, radius, borderWidth, borderColor, fillColor) {
 	ctx.fill();
 	ctx.stroke();
 
-    const text = `[${x} ${y}]`
+	const text = `[${x} ${y}]`;
 
-    ctx.font = "18px serif";
+	ctx.font = '18px serif';
 	ctx.fillStyle = 'black';
-    ctx.fillText(text, Math.round(x - text.length * 18 / 4.5), y + 30)
+	ctx.fillText(text, Math.round(x - (text.length * 18) / 4.5), y + 30);
 }
 
 function drawPoints(points) {
-    ctx.borderWidth = 1;
+	ctx.borderWidth = 1;
 
 	for (let point of points) {
 		drawPoint(
@@ -82,14 +74,11 @@ function mouseDown(event) {
 	startX = event.pageX - event.target.offsetLeft;
 	startY = event.pageY - event.target.offsetTop;
 
-
 	currentPointIndex = null;
 	let index = 0;
 	for (let point of points) {
 		if (mouseInPoint(startX, startY, point)) {
 			currentPointIndex = index;
-            console.log(startX, startY);
-            console.log(currentPointIndex);
 			isDragging = true;
 			return;
 		}
@@ -129,23 +118,19 @@ function mouseMove(event) {
 	const x = event.pageX - event.target.offsetLeft;
 	const y = event.pageY - event.target.offsetTop;
 
-
 	const dx = x - startX;
 	const dy = y - startY;
 
-	const currentPoint = points[currentPointIndex];
+	startX = x;
+	startY = y;
 
-    console.log('CURRENT', currentPointIndex);
-    console.log(`hui ${dx}, ${dy}`)
+	const currentPoint = points[currentPointIndex];
 
 	currentPoint.x += dx;
 	currentPoint.y += dy;
 
 	drawImage();
-    displayCoordinates();
-
-	startX = x;
-	startY = y;
+	displayCoordinates();
 }
 
 canvas.addEventListener('mousedown', mouseDown);
@@ -199,57 +184,51 @@ function getBezierCurve(points, step = 0.01) {
 }
 
 function drawBezierCurve(coordinates) {
-    ctx.lineWidth=2;
-    ctx.strokeStyle = 'blue';
-    ctx.beginPath();
-
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = 'blue';
+	ctx.beginPath();
 
 	for (let i = 0; i < coordinates.length - 1; i++) {
 		ctx.moveTo(coordinates[i][0], coordinates[i][1]);
 		ctx.lineTo(coordinates[i + 1][0], coordinates[i + 1][1]);
 	}
 
-    ctx.stroke();
+	ctx.stroke();
 }
 
 function displayCoordinates() {
-    for (let i = 0; i < points.length; i++) {
-		const cords = document.querySelector(`.coordinates-${i}`);
-        cords.textContent = `[ ${points[i].x} ${points[i].y} ]`
+	for (let i = 0; i < points.length; i++) {
+		const cords = document.querySelector(`.coordinates-${i} div`);
+		cords.textContent = `[ ${points[i].x} ${points[i].y} ]`;
 	}
 }
 
 function drawImage() {
-    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    const flow = getBezierCurve(points, 0.01);
-    drawLines();
-    drawBezierCurve(flow);
-    drawPoints(points);    
+	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+	const flow = getBezierCurve(points, 0.01);
+	drawLines();
+	drawBezierCurve(flow);
+	drawPoints(points);
 }
 
 function drawLines() {
-    ctx.strokeStyle = 'green';
+	ctx.strokeStyle = 'green';
 
-    ctx.beginPath();
-    ctx.setLineDash([10, 10]);
+	ctx.beginPath();
+	ctx.setLineDash([10, 10]);
 
-    for (let i = 0; i < points.length - 1; i++) {
-        ctx.moveTo(
-			points[i].x, points[i].y
-		);
-		ctx.lineTo(
-			points[i + 1].x, points[i + 1].y
-		);
+	for (let i = 0; i < points.length - 1; i++) {
+		ctx.moveTo(points[i].x, points[i].y);
+		ctx.lineTo(points[i + 1].x, points[i + 1].y);
+	}
 
-    }
-
-    ctx.stroke();
-    ctx.setLineDash([]);
+	ctx.stroke();
+	ctx.setLineDash([]);
 }
 
 drawImage();
 
-const divPoints = document.querySelector('#points')
+const divPoints = document.querySelector('#points');
 
 function createDivCoordinates() {
 	const div = document.createElement('div');
@@ -259,27 +238,51 @@ function createDivCoordinates() {
 	for (let i = 0; i < points.length; i++) {
 		const divCoordinates = document.createElement('div');
 		divCoordinates.classList.add(`coordinates-${i}`);
-		divCoordinates.textContent = `[ ${points[i].x} ${points[i].y} ]`;
+
+		const divInfo = document.createElement('div');
+		divInfo.textContent = `[ ${points[i].x} ${points[i].y} ]`;
+
+		const deleteButton = document.createElement('button');
+		deleteButton.textContent = `Delete`;
+
+		deleteButton.addEventListener('click', () => {
+			deleteDivCoordinates();
+			points.splice(i, 1);
+			createDivCoordinates();
+			drawImage();
+		});
+
+		divCoordinates.appendChild(divInfo);
+		divCoordinates.appendChild(deleteButton);
+
 		div.appendChild(divCoordinates);
 	}
 }
 
+function deleteDivCoordinates() {
+	const div = document.querySelector('.cords');
+	div?.remove();
+}
+
 createDivCoordinates();
 
-const addBtn = document.querySelector('#add')
+const addBtn = document.querySelector('#add');
 
 addBtn.addEventListener('click', () => {
-    points.push({
+	deleteDivCoordinates();
+
+	points.push({
 		x: Math.round(CANVAS_WIDTH / 2),
 		y: Math.round(CANVAS_HEIGHT / 2),
 		radius: 8,
 		borderWidth: 1,
 		borderColor: 'black',
 		fillColor: 'red',
-	},)
+	});
 
-    startX = null;
-    startY = null;
-    
-    drawImage();
-})
+	startX = null;
+	startY = null;
+
+	createDivCoordinates();
+	drawImage();
+});
