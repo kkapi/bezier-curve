@@ -51,6 +51,11 @@ button {
 	background: #1d49aa;
 }
 
+#add:disabled {
+    background-color: #8da5d6;
+    cursor: default;
+}
+
 .cords {
     margin-top: 32px;
 }

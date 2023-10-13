@@ -266,6 +266,7 @@ function createDivCoordinates() {
 		deleteButton.textContent = `Удалить`;
 
 		deleteButton.addEventListener('click', () => {
+			addBtn.disabled = false;
 			deleteDivCoordinates();
 			points.splice(i, 1);
 			colors.push(pointColor);
@@ -291,8 +292,7 @@ createDivCoordinates();
 const addBtn = document.querySelector('#add');
 
 addBtn.addEventListener('click', () => {
-	if (points.length >= 9) {
-		alert('Не больше 9 точек (а то слева спиок будет не красивый)')
+	if (points.length > 8) {		
 		return;
 	}
 
@@ -308,6 +308,10 @@ addBtn.addEventListener('click', () => {
 		borderColor: 'black',
 		fillColor: color,
 	});
+
+	if (points.length > 8) {
+		addBtn.disabled = true;
+	}
 
 	startX = null;
 	startY = null;
