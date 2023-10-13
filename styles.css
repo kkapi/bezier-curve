@@ -20,34 +20,66 @@ canvas {
 	border: 1px solid black;
 }
 
+button {
+    cursor: pointer;
+}
+
 .info {
-    border: 1px solid black;
-    height: 601px;
-    width: 400px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+	border: 1px solid black;
+	height: 601px;
+	width: 400px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 
-#points div {
-    margin-bottom: 20px;
-}
-
-.cords div {
-    display: flex;
-    align-items: center;
+#points {
+    width: 100%;
 }
 
 #add {
-    background-color: rgb(180, 238, 180);
-    border-radius: 5px;
-    width: 50px;
-    height: 25px;
-    cursor: pointer;
-    border: 1px solid black;
+	appearance: none;
+	border: 0;
+	border-radius: 5px;
+	background: #4676d7;
+	color: #fff;
+	padding: 8px 16px;
+	font-size: 16px;
 }
 
 #add:hover {
-    background-color: rgba(180, 238, 180, 0.879);;
+	background: #1d49aa;
+}
+
+.cords {
+    margin-top: 32px;
+}
+
+.cords button {
+	appearance: none;
+	border: 0;
+	border-radius: 5px;
+	background: #d74646;
+	color: #fff;
+	padding: 8px 16px;
+	font-size: 16px;
+}
+
+.cords button:hover {
+    background: #aa1d1d;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 50px;
+    margin-bottom: 20px;
+}
+
+.point {
+    width: 20px;
+    height: 20px;
+    border: 2px solid black;
+    border-radius: 50%;
 }

@@ -9,30 +9,42 @@ let isDragging = false;
 let startX = null;
 let startY = null;
 
+const colors = [
+	'#f94144',
+	'#f3722c',
+	'#f8961e',
+	'#f9844a',
+	'#f9c74f',
+	'#90be6d',
+	'#4d908e',
+	'#577590',
+	'#277da1',
+]
+
 const points = [
 	{
 		x: 137,
 		y: 373,
-		radius: 8,
+		radius: 9,
 		borderWidth: 1,
 		borderColor: 'black',
-		fillColor: 'red',
+		fillColor: '#f94144',
 	},
 	{
 		x: 489,
 		y: 72,
-		radius: 8,
+		radius: 9,
 		borderWidth: 1,
 		borderColor: 'black',
-		fillColor: 'red',
+		fillColor: '#f3722c',
 	},
 	{
 		x: 891,
 		y: 436,
-		radius: 8,
+		radius: 9,
 		borderWidth: 1,
 		borderColor: 'black',
-		fillColor: 'red',
+		fillColor: '#f8961e',
 	},
 ];
 
@@ -87,7 +99,7 @@ function mouseDown(event) {
 }
 
 function mouseInPoint(x, y, point) {
-	return (x - point.x) ** 2 + (y - point.y) ** 2 < point.radius ** 2;
+	return (x - point.x) ** 2 + (y - point.y) ** 2 < (point.radius + 20) ** 2;
 }
 
 function mouseUp(event) {
@@ -185,7 +197,7 @@ function getBezierCurve(points, step = 0.01) {
 
 function drawBezierCurve(coordinates) {
 	ctx.lineWidth = 2;
-	ctx.strokeStyle = 'blue';
+	ctx.strokeStyle = '#4676d7';
 	ctx.beginPath();
 
 	for (let i = 0; i < coordinates.length - 1; i++) {
@@ -198,7 +210,7 @@ function drawBezierCurve(coordinates) {
 
 function displayCoordinates() {
 	for (let i = 0; i < points.length; i++) {
-		const cords = document.querySelector(`.coordinates-${i} div`);
+		const cords = document.querySelector(`.coordinates-${i} .div-info`);
 		cords.textContent = `[ ${points[i].x} ${points[i].y} ]`;
 	}
 }
@@ -236,22 +248,32 @@ function createDivCoordinates() {
 	divPoints.appendChild(div);
 
 	for (let i = 0; i < points.length; i++) {
+		const pointColor = points[i].fillColor;
+
 		const divCoordinates = document.createElement('div');
+		divCoordinates.classList.add(`container`);
 		divCoordinates.classList.add(`coordinates-${i}`);
 
+		const point = document.createElement('div');
+		point.classList.add(`point`);
+		point.style.backgroundColor = pointColor;
+
 		const divInfo = document.createElement('div');
+		divInfo.classList.add(`div-info`);
 		divInfo.textContent = `[ ${points[i].x} ${points[i].y} ]`;
 
 		const deleteButton = document.createElement('button');
-		deleteButton.textContent = `Delete`;
+		deleteButton.textContent = `Удалить`;
 
 		deleteButton.addEventListener('click', () => {
 			deleteDivCoordinates();
 			points.splice(i, 1);
+			colors.push(pointColor);
 			createDivCoordinates();
 			drawImage();
 		});
 
+		divCoordinates.appendChild(point);
 		divCoordinates.appendChild(divInfo);
 		divCoordinates.appendChild(deleteButton);
 
@@ -269,15 +291,22 @@ createDivCoordinates();
 const addBtn = document.querySelector('#add');
 
 addBtn.addEventListener('click', () => {
+	if (points.length >= 9) {
+		alert('Не больше 9 точек (а то слева спиок будет не красивый)')
+		return;
+	}
+
 	deleteDivCoordinates();
+
+	const color = colors.pop()
 
 	points.push({
 		x: Math.round(CANVAS_WIDTH / 2),
 		y: Math.round(CANVAS_HEIGHT / 2),
-		radius: 8,
+		radius: 9,
 		borderWidth: 1,
 		borderColor: 'black',
-		fillColor: 'red',
+		fillColor: color,
 	});
 
 	startX = null;
