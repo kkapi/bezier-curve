@@ -31,10 +31,27 @@ button {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+    overflow: auto;
 }
 
 #points {
     width: 100%;
+}
+
+.controls {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    column-gap: 32px;
+    align-items: center;
+    width: 100%;
+    font-size: 16px;
+}
+
+.check {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
 }
 
 #add {
@@ -87,4 +104,8 @@ button {
     height: 20px;
     border: 2px solid black;
     border-radius: 50%;
+}
+
+#lines_check, #cords_check {
+    cursor: pointer;
 }

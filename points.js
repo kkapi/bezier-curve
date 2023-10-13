@@ -19,7 +19,15 @@ const colors = [
 	'#4d908e',
 	'#577590',
 	'#277da1',
-]
+	'#f94144',
+	'#f3722c',
+	'#f8961e',
+	'#f9844a',
+	'#f9c74f',
+	'#90be6d',
+	'#4d908e',
+	'#577590',
+];
 
 const points = [
 	{
@@ -48,6 +56,18 @@ const points = [
 	},
 ];
 
+const lines_check = document.querySelector('#lines_check');
+const cords_check = document.querySelector('#cords_check');
+
+lines_check.addEventListener('change', () => drawImage());
+cords_check.addEventListener('change', () => drawImage());
+
+function drawText(x, y, text, font, style) {
+	ctx.font = font;
+	ctx.fillStyle = style;
+	ctx.fillText(text, Math.round(x - (text.length * 18) / 4.5), y + 30);
+}
+
 function drawPoint(x, y, radius, borderWidth, borderColor, fillColor) {
 	ctx.fillStyle = fillColor;
 	ctx.strokeStyle = borderColor;
@@ -58,11 +78,11 @@ function drawPoint(x, y, radius, borderWidth, borderColor, fillColor) {
 	ctx.fill();
 	ctx.stroke();
 
-	const text = `[${x} ${y}]`;
+	if (cords_check.checked) {
+		const text = `[${x} ${y}]`;
 
-	ctx.font = '18px serif';
-	ctx.fillStyle = 'black';
-	ctx.fillText(text, Math.round(x - (text.length * 18) / 4.5), y + 30);
+		drawText(x, y, text, '18px serif', 'black');
+	}
 }
 
 function drawPoints(points) {
@@ -87,14 +107,13 @@ function mouseDown(event) {
 	startY = event.pageY - event.target.offsetTop;
 
 	currentPointIndex = null;
-	let index = 0;
-	for (let point of points) {
-		if (mouseInPoint(startX, startY, point)) {
-			currentPointIndex = index;
+
+	for (let i = points.length - 1; i > -1; i--) {
+		if (mouseInPoint(startX, startY, points[i])) {
+			currentPointIndex = i;
 			isDragging = true;
 			return;
 		}
-		index++;
 	}
 }
 
@@ -218,7 +237,9 @@ function displayCoordinates() {
 function drawImage() {
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 	const flow = getBezierCurve(points, 0.01);
-	drawLines();
+	if (lines_check.checked) {
+		drawLines();
+	}
 	drawBezierCurve(flow);
 	drawPoints(points);
 }
@@ -247,7 +268,7 @@ function createDivCoordinates() {
 	div.classList.add('cords');
 	divPoints.appendChild(div);
 
-	for (let i = 0; i < points.length; i++) {
+	for (let i = points.length - 1; i > -1; i--) {
 		const pointColor = points[i].fillColor;
 
 		const divCoordinates = document.createElement('div');
@@ -292,13 +313,13 @@ createDivCoordinates();
 const addBtn = document.querySelector('#add');
 
 addBtn.addEventListener('click', () => {
-	if (points.length > 8) {		
+	if (points.length > 19) {
 		return;
 	}
 
 	deleteDivCoordinates();
 
-	const color = colors.pop()
+	const color = colors.pop();
 
 	points.push({
 		x: Math.round(CANVAS_WIDTH / 2),
@@ -309,7 +330,7 @@ addBtn.addEventListener('click', () => {
 		fillColor: color,
 	});
 
-	if (points.length > 8) {
+	if (points.length > 19) {
 		addBtn.disabled = true;
 	}
 

@@ -2,16 +2,35 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<title>computer-graphics</title>
+		<title>bezier-curve</title>
 		<link rel="stylesheet" href="./styles.css" />
-		<link rel="icon" href="./cube.png" />
+		<link rel="icon" href="./curve-light.png" />
 	</head>
 	<body>
 		<div class="info">
+			<div class="controls">
+				<button id="add">Добавить точку</button>
+				<div>
+					<div class="check">
+						<label for="cords_check">Координаты</label>
+						<input
+							type="checkbox"
+							id="cords_check"
+							checked="true"
+						/>
+					</div>
+					<div class="check">
+						<label for="lines_check">Линии</label>
+						<input
+							type="checkbox"
+							id="lines_check"
+							checked="true"
+						/>
+					</div>
+				</div>
+			</div>
 			<div id="points"></div>
-			<button id="add">Добавить</button>
 		</div>
-
 		<canvas height="600" width="1000" id="canvas">Обновите браузер</canvas>
 		<script src="./points.js"></script>
 	</body>
