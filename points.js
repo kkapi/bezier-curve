@@ -14,7 +14,7 @@ const POINT_BORDER_COLOR = 'black';
 const POINT_BORDER_WIDTH = 1;
 const POINT_RADIUS = 9;
 
-const COORDINATES_FONT ='18px serif';
+const COORDINATES_FONT = '18px serif';
 const COORDINATES_COLOR = 'black';
 
 const ADDITIONAL_CAPTURE_RADIUS = 20;
@@ -89,7 +89,11 @@ function getBezierCurveCoordinates(points, step) {
 		coordinates[ind] = [0, 0];
 
 		for (let i = 0; i < points.length; i++) {
-			const coefficient = getWeightCoefficientValue(i, points.length - 1, t);
+			const coefficient = getWeightCoefficientValue(
+				i,
+				points.length - 1,
+				t
+			);
 
 			coordinates[ind][0] += points[i].x * coefficient;
 			coordinates[ind][1] += points[i].y * coefficient;
@@ -202,11 +206,12 @@ function drawImage() {
 
 	const step = 0.01;
 	const cords = getBezierCurveCoordinates(points, step);
+	
 	drawBezierCurve(cords, CURVE_WIDTH, CURVE_COLOR);
 
 	if (lines_check.checked) drawLines(points, LINE_WIDTH, LINE_COLOR);
 	if (cords_check.checked) drawPointsCoordinates(points);
-	
+
 	drawPoints(points);
 }
 
@@ -230,7 +235,7 @@ function addPoint() {
 
 	if (points.length > 19) addBtn.disabled = true;
 
-	createDivCoordinates();
+	displayDivCoordinates();
 	drawImage();
 }
 
@@ -254,7 +259,10 @@ function mouseDown(event) {
 }
 
 function mouseInPoint(x, y, point) {
-	return (x - point.x) ** 2 + (y - point.y) ** 2 < (point.radius + ADDITIONAL_CAPTURE_RADIUS) ** 2;
+	return (
+		(x - point.x) ** 2 + (y - point.y) ** 2 <
+		(point.radius + ADDITIONAL_CAPTURE_RADIUS) ** 2
+	);
 }
 
 function mouseUp() {
@@ -272,7 +280,7 @@ function mouseOut() {
 function mouseMove(event) {
 	if (!isDragging) return;
 
-	[x, y] = getCanvasMouseCoordinates(event);
+	const [x, y] = getCanvasMouseCoordinates(event);
 
 	const dx = x - startX;
 	const dy = y - startY;
@@ -296,43 +304,74 @@ function displayCoordinates() {
 	}
 }
 
-function createDivCoordinates() {
-	const div = document.createElement('div');
-	div.classList.add('cords');
-	divPoints.appendChild(div);
+function displayDivCoordinates() {
+	const divCoordinates = createDivCoordinates();
 
 	for (let i = points.length - 1; i > -1; i--) {
-		const divCoordinates = document.createElement('div');
-		divCoordinates.classList.add(`container`);
-		divCoordinates.classList.add(`coordinates-${i}`);
+		const divContainer = createDivContainer(i);
+		const divPoint = createDivPoint(i);
+		const divInfo = createDivInfo(i);
+		const deleteButton = createDeleteButton(i);
 
-		const point = document.createElement('div');
-		point.classList.add(`point`);
-		const pointColor = points[i].fillColor;
-		point.style.backgroundColor = pointColor;
+		divContainer.appendChild(divPoint);
+		divContainer.appendChild(divInfo);
+		divContainer.appendChild(deleteButton);
 
-		const divInfo = document.createElement('div');
-		divInfo.classList.add(`div-info`);
-		divInfo.textContent = `[ ${points[i].x} ${points[i].y} ]`;
-
-		const deleteButton = document.createElement('button');
-		deleteButton.textContent = `Удалить`;
-
-		deleteButton.addEventListener('click', () => {
-			addBtn.disabled = false;
-			deleteDivCoordinates();
-			points.splice(i, 1);
-			colors.push(pointColor);
-			createDivCoordinates();
-			drawImage();
-		});
-
-		divCoordinates.appendChild(point);
-		divCoordinates.appendChild(divInfo);
-		divCoordinates.appendChild(deleteButton);
-
-		div.appendChild(divCoordinates);
+		divCoordinates.appendChild(divContainer);
 	}
+
+	divPoints.appendChild(divCoordinates);
+}
+
+function createDivCoordinates() {
+	const divCoordinates = document.createElement('div');
+	divCoordinates.classList.add('cords');
+
+	return divCoordinates;
+}
+
+function createDivContainer(i) {
+	const divContainer = document.createElement('div');
+
+	divContainer.classList.add(`container`);
+	divContainer.classList.add(`coordinates-${i}`);
+
+	return divContainer;
+}
+
+function createDivPoint(i) {
+	const divPoint = document.createElement('div');
+
+	divPoint.classList.add(`point`);
+	const pointColor = points[i].fillColor;
+	divPoint.style.backgroundColor = pointColor;
+
+	return divPoint;
+}
+
+function createDivInfo(i) {
+	const divInfo = document.createElement('div');
+
+	divInfo.classList.add(`div-info`);
+	divInfo.textContent = `[ ${points[i].x} ${points[i].y} ]`;
+
+	return divInfo;
+}
+
+function createDeleteButton(i) {
+	const deleteButton = document.createElement('button');
+	deleteButton.textContent = `Удалить`;
+
+	deleteButton.addEventListener('click', () => {
+		addBtn.disabled = false;
+		deleteDivCoordinates();
+		points.splice(i, 1);
+		colors.push(pointColor);
+		displayDivCoordinates();
+		drawImage();
+	});
+
+	return deleteButton;
 }
 
 function deleteDivCoordinates() {
@@ -350,5 +389,5 @@ addBtn.addEventListener('click', addPoint);
 lines_check.addEventListener('change', drawImage);
 cords_check.addEventListener('change', drawImage);
 
-createDivCoordinates();
+displayDivCoordinates();
 drawImage();
