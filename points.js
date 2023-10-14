@@ -206,7 +206,7 @@ function drawImage() {
 
 	const step = 0.01;
 	const cords = getBezierCurveCoordinates(points, step);
-	
+
 	drawBezierCurve(cords, CURVE_WIDTH, CURVE_COLOR);
 
 	if (lines_check.checked) drawLines(points, LINE_WIDTH, LINE_COLOR);
@@ -308,10 +308,12 @@ function displayDivCoordinates() {
 	const divCoordinates = createDivCoordinates();
 
 	for (let i = points.length - 1; i > -1; i--) {
+		const pointColor = points[i].fillColor;
+
 		const divContainer = createDivContainer(i);
-		const divPoint = createDivPoint(i);
+		const divPoint = createDivPoint(pointColor);
 		const divInfo = createDivInfo(i);
-		const deleteButton = createDeleteButton(i);
+		const deleteButton = createDeleteButton(i, pointColor);
 
 		divContainer.appendChild(divPoint);
 		divContainer.appendChild(divInfo);
@@ -339,11 +341,10 @@ function createDivContainer(i) {
 	return divContainer;
 }
 
-function createDivPoint(i) {
+function createDivPoint(pointColor) {
 	const divPoint = document.createElement('div');
 
 	divPoint.classList.add(`point`);
-	const pointColor = points[i].fillColor;
 	divPoint.style.backgroundColor = pointColor;
 
 	return divPoint;
@@ -358,7 +359,7 @@ function createDivInfo(i) {
 	return divInfo;
 }
 
-function createDeleteButton(i) {
+function createDeleteButton(i, pointColor) {
 	const deleteButton = document.createElement('button');
 	deleteButton.textContent = `Удалить`;
 
