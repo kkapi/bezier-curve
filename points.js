@@ -14,6 +14,11 @@ const POINT_BORDER_COLOR = 'black';
 const POINT_BORDER_WIDTH = 1;
 const POINT_RADIUS = 9;
 
+const COORDINATES_FONT ='18px serif';
+const COORDINATES_COLOR = 'black';
+
+const ADDITIONAL_CAPTURE_RADIUS = 20;
+
 let currentPointIndex = null;
 let isDragging = false;
 let startX = null;
@@ -73,25 +78,25 @@ const cords_check = document.querySelector('#cords_check');
 
 const divPoints = document.querySelector('#points');
 
-// cords - массив опорных точек. Точка - двухэлементный массив, (x = cords[0], y = cords[1])
+// points - массив опорных точек. Точка - двухэлементный массив, (x = points[0], y = points[1])
 // step - шаг при расчете кривой (0 < step < 1)
-function getBezierCurve(cords, step) {
-	const res = [];
+function getBezierCurveCoordinates(points, step) {
+	const coordinates = [];
 
 	for (let t = 0; t < 1 + step; t += step) {
-		const ind = res.length;
+		const ind = coordinates.length;
 
-		res[ind] = [0, 0];
+		coordinates[ind] = [0, 0];
 
-		for (let i = 0; i < cords.length; i++) {
-			const b = getWeightCoefficientValue(i, cords.length - 1, t);
+		for (let i = 0; i < points.length; i++) {
+			const coefficient = getWeightCoefficientValue(i, points.length - 1, t);
 
-			res[ind][0] += cords[i].x * b;
-			res[ind][1] += cords[i].y * b;
+			coordinates[ind][0] += points[i].x * coefficient;
+			coordinates[ind][1] += points[i].y * coefficient;
 		}
 	}
 
-	return res;
+	return coordinates;
 }
 
 // i - номер вершины, n - количество вершин, t - положение кривой (от 0 до 1)
@@ -150,25 +155,29 @@ function drawPoint(x, y, radius, borderWidth, borderColor, fillColor) {
 	ctx.arc(x, y, radius, 0, Math.PI * 2);
 	ctx.fill();
 	ctx.stroke();
-
-	if (cords_check.checked) drawPointCoordinates(x, y);
 }
 
-function drawPointCoordinates(x, y) {
-	const text = `[${x} ${y}]`;
-
-	const textX = Math.round(x - (text.length * 18) / 4.5);
-	const textY = y + 30;
-
-	const font = '18px serif';
-	const style = 'black';
-
-	drawText(textX, textY, text, font, style);
+function drawPointsCoordinates(points) {
+	for (let point of points) {
+		drawPointCoordinates(point);
+	}
 }
 
-function drawText(x, y, text, font, style) {
+function drawPointCoordinates(point) {
+	const text = `[${point.x} ${point.y}]`;
+
+	const textX = Math.round(point.x - (text.length * 18) / 4.5);
+	const textY = point.y + 30;
+
+	const font = COORDINATES_FONT;
+	const color = COORDINATES_COLOR;
+
+	drawText(textX, textY, text, font, color);
+}
+
+function drawText(x, y, text, font, color) {
 	ctx.font = font;
-	ctx.fillStyle = style;
+	ctx.fillStyle = color;
 	ctx.fillText(text, x, y);
 }
 
@@ -192,11 +201,12 @@ function drawImage() {
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
 	const step = 0.01;
-	const cords = getBezierCurve(points, step);
+	const cords = getBezierCurveCoordinates(points, step);
+	drawBezierCurve(cords, CURVE_WIDTH, CURVE_COLOR);
 
 	if (lines_check.checked) drawLines(points, LINE_WIDTH, LINE_COLOR);
-
-	drawBezierCurve(cords, CURVE_WIDTH, CURVE_COLOR);
+	if (cords_check.checked) drawPointsCoordinates(points);
+	
 	drawPoints(points);
 }
 
@@ -224,9 +234,15 @@ function addPoint() {
 	drawImage();
 }
 
+function getCanvasMouseCoordinates(event) {
+	const x = event.pageX - event.target.offsetLeft;
+	const y = event.pageY - event.target.offsetTop;
+
+	return [x, y];
+}
+
 function mouseDown(event) {
-	startX = event.pageX - event.target.offsetLeft;
-	startY = event.pageY - event.target.offsetTop;
+	[startX, startY] = getCanvasMouseCoordinates(event);
 
 	for (let i = points.length - 1; i > -1; i--) {
 		if (mouseInPoint(startX, startY, points[i])) {
@@ -238,7 +254,7 @@ function mouseDown(event) {
 }
 
 function mouseInPoint(x, y, point) {
-	return (x - point.x) ** 2 + (y - point.y) ** 2 < (point.radius + 20) ** 2;
+	return (x - point.x) ** 2 + (y - point.y) ** 2 < (point.radius + ADDITIONAL_CAPTURE_RADIUS) ** 2;
 }
 
 function mouseUp() {
@@ -256,8 +272,7 @@ function mouseOut() {
 function mouseMove(event) {
 	if (!isDragging) return;
 
-	const x = event.pageX - event.target.offsetLeft;
-	const y = event.pageY - event.target.offsetTop;
+	[x, y] = getCanvasMouseCoordinates(event);
 
 	const dx = x - startX;
 	const dy = y - startY;
@@ -287,14 +302,13 @@ function createDivCoordinates() {
 	divPoints.appendChild(div);
 
 	for (let i = points.length - 1; i > -1; i--) {
-		const pointColor = points[i].fillColor;
-
 		const divCoordinates = document.createElement('div');
 		divCoordinates.classList.add(`container`);
 		divCoordinates.classList.add(`coordinates-${i}`);
 
 		const point = document.createElement('div');
 		point.classList.add(`point`);
+		const pointColor = points[i].fillColor;
 		point.style.backgroundColor = pointColor;
 
 		const divInfo = document.createElement('div');
